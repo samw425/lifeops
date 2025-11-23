@@ -1,22 +1,57 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle2, Circle, Clock } from 'lucide-react'
+import { CheckCircle2, Circle, Clock, Sparkles } from 'lucide-react'
 import FocusBlockModal, { type FocusBlockData } from '@/components/FocusBlockModal'
 import NightReview from './NightReview'
 
 export default function TodayView({ checkIn, priorities, focusAreas }: { checkIn: any, priorities: any[], focusAreas: any[] }) {
     const [showFocusModal, setShowFocusModal] = useState(false)
     const [showNightReview, setShowNightReview] = useState(false)
+    const [coachingTip, setCoachingTip] = useState<string | null>(null)
+    const [tipLoading, setTipLoading] = useState(false)
     const router = useRouter()
     const supabase = createClient()
 
     const completedCount = priorities.filter(p => p.is_completed).length
     const isEvening = new Date().getHours() >= 17
+
+    useEffect(() => {
+        // Auto-fetch coaching tip on mount if not evening
+        if (!isEvening && !checkIn.night_review_completed_at) {
+            fetchCoachingTip()
+        }
+    }, [])
+
+    const fetchCoachingTip = async () => {
+        setTipLoading(true)
+        try {
+            const currentHour = new Date().getHours()
+            const timeOfDay = currentHour < 12 ? 'morning' : currentHour < 17 ? 'afternoon' : 'evening'
+
+            const response = await fetch('/api/ai/coaching_tip', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    current_priorities: priorities,
+                    mood: checkIn.mood,
+                    energy: checkIn.energy,
+                    time_of_day: timeOfDay
+                })
+            })
+
+            const { tip } = await response.json()
+            setCoachingTip(tip)
+        } catch (error) {
+            console.error('Failed to fetch coaching tip:', error)
+        } finally {
+            setTipLoading(false)
+        }
+    }
 
     const togglePriority = async (id: string, currentStatus: boolean) => {
         await supabase
@@ -61,6 +96,20 @@ export default function TodayView({ checkIn, priorities, focusAreas }: { checkIn
                     />
                 </div>
             </div>
+
+            {/* AI Coaching Tip */}
+            {coachingTip && (
+                <Card className="border-2 border-amber-500/20 bg-amber-500/5 animate-in fade-in slide-in-from-top-2 duration-500">
+                    <CardContent className="pt-4">
+                        <div className="flex items-start gap-3">
+                            <Sparkles className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
+                            <div className="flex-1">
+                                <p className="text-sm font-medium text-foreground/90">{coachingTip}</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Priority Cards */}
             <Card>
