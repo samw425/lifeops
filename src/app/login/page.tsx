@@ -65,6 +65,36 @@ export default function LoginPage() {
                             {loading ? 'Sending Link...' : 'Sign In with Email'}
                         </Button>
                     </form>
+
+                    <div className="relative my-4">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">Or try it out</span>
+                        </div>
+                    </div>
+
+                    <Button
+                        variant="outline"
+                        className="w-full border-primary/20 hover:bg-primary/5 hover:text-primary"
+                        onClick={async () => {
+                            setLoading(true)
+                            const { error } = await supabase.auth.signInWithPassword({
+                                email: 'demo@lifeops.app',
+                                password: 'lifeops-demo-user'
+                            })
+                            if (error) {
+                                setMessage(error.message)
+                                setLoading(false)
+                            } else {
+                                router.push('/dashboard')
+                            }
+                        }}
+                        disabled={loading}
+                    >
+                        Guest Login (No Email Required)
+                    </Button>
                 </CardContent>
             </Card>
         </div>
