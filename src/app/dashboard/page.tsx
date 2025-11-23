@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import ThePulse from '@/components/ThePulse'
 import { ArrowRight, Battery, Zap } from 'lucide-react'
+import OnboardingTour from '@/components/onboarding/OnboardingTour'
+import HelpModal from '@/components/HelpModal'
 
 export default async function DashboardPage() {
     const supabase = await createClient()
@@ -25,6 +27,9 @@ export default async function DashboardPage() {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
+            <OnboardingTour />
+            <HelpModal />
+
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-4xl font-bold tracking-tight text-gradient">
@@ -84,7 +89,9 @@ export default async function DashboardPage() {
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                <p className="text-muted-foreground">You haven't checked in yet.</p>
+                                <p className="text-muted-foreground text-sm">
+                                    Clear your mental RAM. Dump your thoughts, and let AI organize your day.
+                                </p>
                                 <Button asChild className="w-full shadow-lg shadow-primary/20">
                                     <Link href="/today">Start Morning Check-in</Link>
                                 </Button>
@@ -107,8 +114,8 @@ export default async function DashboardPage() {
                         <CardTitle>Weekly Pulse</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[120px] flex items-center justify-center text-muted-foreground/50 border-2 border-dashed border-white/5 rounded-lg">
-                            No data yet
+                        <div className="h-[120px] flex items-center justify-center text-muted-foreground/50 border-2 border-dashed border-white/5 rounded-lg text-sm text-center px-4">
+                            Complete 3 daily check-ins to unlock weekly insights.
                         </div>
                         <Button asChild variant="ghost" className="w-full mt-4 hover:bg-white/5">
                             <Link href="/weekly">Go to Weekly Review</Link>

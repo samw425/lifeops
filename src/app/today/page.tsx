@@ -44,5 +44,5 @@ export default async function TodayPage() {
         .select('*')
         .eq('checkin_id', checkIn.id)
 
-    return <TodayView checkIn={checkIn} priorities={priorities || []} />
+    return <TodayView checkIn={checkIn} priorities={priorities || []} focusAreas={focusAreas || []} />
 }
