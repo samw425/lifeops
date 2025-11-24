@@ -51,7 +51,7 @@ export default async function DashboardPage() {
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-4xl font-bold tracking-tight text-gradient">
+                    <h1 className="text-4xl font-bold tracking-tight text-foreground">
                         Good {greeting}, {displayName}
                     </h1>
                     <p className="text-muted-foreground mt-1 text-lg">

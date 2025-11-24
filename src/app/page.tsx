@@ -13,8 +13,8 @@ export default function Home() {
                         <span className="text-sm font-medium text-primary">Clarity You Can Live In</span>
                     </div>
 
-                    <h1 className="text-6xl md:text-7xl font-bold tracking-tight">
-                        Your Personal <span className="text-gradient">Operating System</span>
+                    <h1 className="text-6xl md:text-7xl font-bold tracking-tight text-foreground">
+                        Your Personal <span className="text-primary">Operating System</span>
                     </h1>
 
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
