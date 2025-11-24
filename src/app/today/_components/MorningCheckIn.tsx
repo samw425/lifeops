@@ -71,23 +71,30 @@ export default function MorningCheckIn({ focusAreas, goals }: { focusAreas: any[
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Mood (1-5)</label>
                         <input
-                            type="range" min="1" max="5"
+                            type="range" min="1" max="5" step="1"
                             value={mood} onChange={(e) => setMood(parseInt(e.target.value))}
-                            className="w-full"
+                            className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
                         />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>Drained</span>
-                            <span>Great</span>
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Drained</span>
+                            <span className="font-semibold text-primary">{mood}/5</span>
+                            <span className="text-muted-foreground">Great</span>
                         </div>
                     </div>
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Energy (1-5)</label>
                         <input
-                            type="range" min="1" max="5"
+                            type="range" min="1" max="5" step="1"
                             value={energy} onChange={(e) => setEnergy(parseInt(e.target.value))}
-                            className="w-full"
+                            className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
                         />
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Low</span>
+                            <span className="font-semibold text-primary">{energy}/5</span>
+                            <span className="text-muted-foreground">High</span>
+                        </div>
+                    </div>
                         <div className="flex justify-between text-xs text-muted-foreground">
                             <span>Low</span>
                             <span>High</span>
@@ -115,6 +122,6 @@ export default function MorningCheckIn({ focusAreas, goals }: { focusAreas: any[
                     </Button>
                 </CardContent>
             </Card>
-        </div>
+        </div >
     )
 }
