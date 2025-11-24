@@ -54,12 +54,15 @@ export default function TodayView({ checkIn, priorities, focusAreas }: { checkIn
     }
 
     const togglePriority = async (id: string, currentStatus: boolean) => {
-        await supabase
+        const { error } = await supabase
             .from('daily_priorities')
             .update({ is_completed: !currentStatus })
             .eq('id', id)
 
-        router.refresh()
+        if (!error) {
+            // Update local state instead of full page refresh
+            router.refresh()
+        }
     }
 
     const saveFocusBlock = async (blockData: FocusBlockData) => {
