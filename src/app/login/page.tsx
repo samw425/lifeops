@@ -9,92 +9,129 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [loading, setLoading] = useState(false)
-    const [message, setMessage] = useState('')
+    const [error, setError] = useState<string | null>(null)
+    const [emailSent, setEmailSent] = useState(false)
     const router = useRouter()
     const supabase = createClient()
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault()
+    const handleEmailLogin = async () => {
+        if (!email) return
+
         setLoading(true)
-        setMessage('')
+        setError(null)
 
         const { error } = await supabase.auth.signInWithOtp({
             email,
             options: {
-                emailRedirectTo: `${location.origin}/auth/callback`,
+                emailRedirectTo: `${window.location.origin}/auth/callback`,
             },
         })
 
         if (error) {
-            setMessage(error.message)
+            setError(error.message)
+            setLoading(false)
         } else {
-            setMessage('Check your email for the login link!')
+            setEmailSent(true)
+            setLoading(false)
         }
-        setLoading(false)
+    }
+
+    const handleAnonymousLogin = async () => {
+        setLoading(true)
+        setError(null)
+
+        // Create unique anonymous user
+        const { error } = await supabase.auth.signInAnonymously()
+
+        if (error) {
+            setError(error.message)
+            setLoading(false)
+        } else {
+            router.push('/dashboard')
+        }
+    }
+
+    if (emailSent) {
+        return (
+            <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
+                <Card className="w-full max-w-md glass">
+                    <CardHeader className="text-center">
+                        <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                            <Sparkles className="w-6 h-6 text-primary" />
+                        </div>
+                        <CardTitle className="text-2xl">Check Your Email</CardTitle>
+                        <CardDescription className="text-base mt-2">
+                            We sent a magic link to <strong>{email}</strong>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <p className="text-sm text-muted-foreground text-center">
+                            Click the link in the email to sign in. You can close this window.
+                        </p>
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => setEmailSent(false)}
+                        >
+                            Try Different Email
+                        </Button>
+                    </CardContent>
+                </Card>
+            </div>
+        )
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4">
-            <Card className="w-full max-w-md">
-                <CardHeader className="text-center">
-                    <CardTitle className="text-3xl font-bold mb-2">LifeOps™</CardTitle>
-                    <p className="text-muted-foreground">Clarity You Can Live In.</p>
+        <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
+            <Card className="w-full max-w-md glass">
+                <CardHeader className="text-center space-y-2">
+                    <div className="mx-auto w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-2">
+                        <span className="text-white font-bold text-2xl">L</span>
+                    </div>
+                    <CardTitle className="text-3xl font-bold">Welcome to LifeOps™</CardTitle>
+                    <CardDescription className="text-base">
+                        Clarity You Can Live In
+                    </CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium">
-                                Email
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                placeholder="you@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                required
-                            />
+                <CardContent className="space-y-6">
+                    {/* Email Login - Primary Option */}
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                            <Sparkles className="w-4 h-4" />
+                            <span>Recommended</span>
                         </div>
-                        {message && (
-                            <div className="p-3 text-sm bg-secondary rounded-md text-secondary-foreground">
-                                {message}
-                            </div>
-                        )}
-                        <Button type="submit" className="w-full" disabled={loading}>
-                            {loading ? 'Sending Link...' : 'Sign In with Email'}
+                        <Input
+                            type="email"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleEmailLogin()}
+                            className="h-12 text-base"
+                        />
+                        <Button
+                            onClick={handleEmailLogin}
+                            disabled={loading || !email}
+                            className="w-full h-12 text-base shadow-lg shadow-primary/25"
+                        >
+                            {loading ? 'Sending Magic Link...' : 'Continue with Email'}
                         </Button>
-                    </form>
-
-                    <div className="relative my-4">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-background px-2 text-muted-foreground">Or try it out</span>
-                        </div>
+                        <p className="text-xs text-muted-foreground text-center">
+                            No password needed • Your data syncs across devices
+                        </p>
                     </div>
 
-                    <Button
-                        variant="outline"
-                        className="w-full border-primary/20 hover:bg-primary/5 hover:text-primary"
-                        onClick={async () => {
-                            setLoading(true)
-                            const { error } = await supabase.auth.signInWithPassword({
-                                email: 'demo@lifeops.app',
-                                password: 'lifeops-demo-user'
-                            })
-                            if (error) {
-                                setMessage(error.message)
-                                setLoading(false)
-                            } else {
-                                router.push('/dashboard')
+                    {/* Divider */}
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t"></div>
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
                             }
                         }}
-                        disabled={loading}
+                            disabled={loading}
                     >
-                        Guest Login (No Email Required)
-                    </Button>
+                            Guest Login (No Email Required)
+                        </Button>
                 </CardContent>
             </Card>
         </div>
