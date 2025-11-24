@@ -18,11 +18,11 @@ export default function TodayView({ checkIn, priorities, focusAreas }: { checkIn
     const supabase = createClient()
 
     const completedCount = priorities.filter(p => p.is_completed).length
-    const isEvening = new Date().getHours() >= 17
+    const hasCompletedWork = completedCount > 0 || priorities.length > 0
 
     useEffect(() => {
-        // Auto-fetch coaching tip on mount if not evening
-        if (!isEvening && !checkIn.night_review_completed_at) {
+        // Auto-fetch coaching tip on mount if not completed
+        if (!checkIn.night_review_completed_at) {
             fetchCoachingTip()
         }
     }, [])
@@ -157,14 +157,13 @@ export default function TodayView({ checkIn, priorities, focusAreas }: { checkIn
                     <span className="text-xs text-muted-foreground">Track your attention</span>
                 </Button>
                 <Button
-                    variant={isEvening ? "default" : "outline"}
+                    variant={hasCompletedWork ? "default" : "outline"}
                     className="h-24 flex flex-col gap-2"
                     onClick={() => setShowNightReview(true)}
-                    disabled={!isEvening && !checkIn.night_review_completed_at}
                 >
-                    <span className="text-sm font-semibold">Night Review</span>
+                    <span className="text-sm font-semibold">Reflect & Review</span>
                     <span className="text-xs text-muted-foreground">
-                        {isEvening ? 'Close the loop' : 'Available after 5 PM'}
+                        Close the loop
                     </span>
                 </Button>
             </div>

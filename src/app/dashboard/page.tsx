@@ -16,6 +16,15 @@ export default async function DashboardPage() {
         return <div>Please log in</div>
     }
 
+    // Fetch user profile for personalization
+    const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('first_name')
+        .eq('user_id', user.id)
+        .single()
+
+    const displayName = profile?.first_name || user.email?.split('@')[0] || 'there'
+
     const today = new Date().toISOString().split('T')[0]
 
     const { data: checkIn } = await supabase
@@ -25,6 +34,9 @@ export default async function DashboardPage() {
         .eq('date', today)
         .single()
 
+    const currentHour = new Date().getHours()
+    const greeting = currentHour < 12 ? 'Morning' : currentHour < 18 ? 'Afternoon' : 'Evening'
+
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
             <OnboardingTour />
@@ -33,7 +45,7 @@ export default async function DashboardPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-4xl font-bold tracking-tight text-gradient">
-                        Good {new Date().getHours() < 12 ? 'Morning' : 'Evening'}, {user.email?.split('@')[0]}
+                        Good {greeting}, {displayName}
                     </h1>
                     <p className="text-muted-foreground mt-1 text-lg">
                         {format(new Date(), 'EEEE, MMMM do')}
