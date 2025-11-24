@@ -40,39 +40,11 @@ export default function OnboardingTour() {
     const supabase = createClient()
 
     useEffect(() => {
-        const checkOnboarding = async () => {
-            const hasSeenTour = localStorage.getItem('lifeops_onboarding_seen')
-            if (!hasSeenTour) {
-                try {
-                    const { data: { user } } = await supabase.auth.getUser();
-
-                    if (!user) {
-                        // If no user is logged in, don't show onboarding tour
-                        // or handle as per application logic (e.g., redirect to login)
-                        return;
-                    }
-
-                    // Check if user has a profile
-                    const { data: profile, error } = await supabase
-                        .from('user_profiles')
-                        .select('first_name')
-                        .eq('user_id', user.id)
-                        .single()
-
-                    // If table doesn't exist or no profile, show tour
-                    if (error || !profile) {
-                        setIsOpen(true)
-                    } else {
-                        // Has profile, mark as seen
-                        localStorage.setItem('lifeops_onboarding_seen', 'true')
-                    }
-                } catch (err) {
-                    // Fail gracefully - show tour if anything goes wrong (e.g., network error, Supabase client error)
-                    setIsOpen(true)
-                }
-            }
+        // Simple check - if localStorage flag not set, show tour
+        const hasSeenTour = localStorage.getItem('lifeops_onboarding_seen')
+        if (!hasSeenTour) {
+            setIsOpen(true)
         }
-        checkOnboarding()
     }, [])
 
     const handleNext = () => {
