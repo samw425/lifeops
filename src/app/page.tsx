@@ -18,8 +18,7 @@ export default function Home() {
                     </h1>
 
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                        LifeOps™ transforms your mental chaos into clear priorities.
-                        AI-powered daily and weekly loops that actually work.
+                        LifeOps™ transforms your mental chaos into clear priorities with LifeOps AI—our proprietary intelligence that learns how you work.
                     </p>
 
                     <div className="flex gap-4 justify-center pt-4">
@@ -39,7 +38,7 @@ export default function Home() {
                         </div>
                         <h3 className="text-xl font-semibold mb-2">Daily Clarity</h3>
                         <p className="text-muted-foreground">
-                            Brain dump → AI sorts → 3 clear priorities. Every single day.
+                            Brain dump → LifeOps AI sorts → 3 clear priorities. Every single day.
                         </p>
                     </div>
 
@@ -49,7 +48,7 @@ export default function Home() {
                         </div>
                         <h3 className="text-xl font-semibold mb-2">Pattern Recognition</h3>
                         <p className="text-muted-foreground">
-                            AI analyzes your week to find what works and what doesn't.
+                            LifeOps AI analyzes your week to find what works and what doesn't.
                         </p>
                     </div>
 
@@ -59,7 +58,7 @@ export default function Home() {
                         </div>
                         <h3 className="text-xl font-semibold mb-2">Weekly Evolution</h3>
                         <p className="text-muted-foreground">
-                            Continuous improvement through AI-suggested experiments.
+                            Continuous improvement through LifeOps AI-suggested experiments.
                         </p>
                     </div>
                 </div>

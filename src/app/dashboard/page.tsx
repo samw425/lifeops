@@ -103,7 +103,7 @@ export default async function DashboardPage() {
                                 ) : (
                                     <div className="space-y-4">
                                         <p className="text-muted-foreground text-sm">
-                                            Clear your mental RAM. Dump your thoughts, and let AI organize your day.
+                                            Clear your mental RAM. Dump your thoughts, and LifeOps AI organizes your day.
                                         </p>
                                         <Button asChild className="w-full shadow-lg shadow-primary/20">
                                             <Link href="/today">Start Morning Check-in</Link>
