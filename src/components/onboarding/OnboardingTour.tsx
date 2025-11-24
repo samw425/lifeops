@@ -40,11 +40,17 @@ export default function OnboardingTour() {
     const supabase = createClient()
 
     useEffect(() => {
-        // Simple check - if localStorage flag not set, show tour
-        const hasSeenTour = localStorage.getItem('lifeops_onboarding_seen')
-        if (!hasSeenTour) {
-            setIsOpen(true)
+        const checkOnboarding = async () => {
+            // Always show for users who haven't set their name yet
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return
+
+            const hasCompletedOnboarding = localStorage.getItem('lifeops_onboarding_completed')
+            if (!hasCompletedOnboarding) {
+                setIsOpen(true)
+            }
         }
+        checkOnboarding()
     }, [])
 
     const handleNext = () => {
@@ -59,17 +65,15 @@ export default function OnboardingTour() {
 
     const handleSkipName = async () => {
         try {
-            // Try to create profile without name
             await supabase.from('user_profiles').insert({
                 user_id: (await supabase.auth.getUser()).data.user?.id,
                 first_name: null
             })
         } catch (err) {
-            // Silently fail if table doesn't exist - not critical for MVP
             console.log('Profile creation skipped:', err)
         }
         setShowNameInput(false)
-        localStorage.setItem('lifeops_onboarding_seen', 'true')
+        localStorage.setItem('lifeops_onboarding_completed', 'true')
         router.refresh()
     }
 
@@ -87,11 +91,10 @@ export default function OnboardingTour() {
             })
         } catch (err) {
             console.log('Profile creation failed:', err)
-            // Continue anyway - name is nice-to-have, not critical
         }
         setSaving(false)
         setShowNameInput(false)
-        localStorage.setItem('lifeops_onboarding_seen', 'true')
+        localStorage.setItem('lifeops_onboarding_completed', 'true')
         router.refresh()
     }
 
