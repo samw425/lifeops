@@ -112,30 +112,32 @@ export default async function DashboardPage() {
                                 )}
                             </CardContent>
                         </Card>
+                    </Link>
 
-                        {/* Pulse Card */}
-                        <div className="relative group">
-                            <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl opacity-30 group-hover:opacity-70 blur transition duration-1000 group-hover:duration-200" />
-                            <Card className="relative h-full border-0 bg-black/90">
-                                <ThePulse energy={checkIn?.energy} mood={checkIn?.mood} />
-                            </Card>
-                        </div>
-
-                        {/* Weekly Pulse */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Weekly Pulse</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="h-[120px] flex items-center justify-center text-muted-foreground/50 border-2 border-dashed border-white/5 rounded-lg text-sm text-center px-4">
-                                    Complete 3 daily check-ins to unlock weekly insights.
-                                </div>
-                                <Button asChild variant="ghost" className="w-full mt-4 hover:bg-white/5">
-                                    <Link href="/weekly">Go to Weekly Review</Link>
-                                </Button>
-                            </CardContent>
+                    {/* Pulse Card */}
+                    <div className="relative group">
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl opacity-30 group-hover:opacity-70 blur transition duration-1000 group-hover:duration-200" />
+                        <Card className="relative h-full border-0 bg-black/90">
+                            <ThePulse energy={checkIn?.energy} mood={checkIn?.mood} />
                         </Card>
+                    </div>
+
+                    {/* Weekly Pulse */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Weekly Pulse</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-[120px] flex items-center justify-center text-muted-foreground/50 border-2 border-dashed border-white/5 rounded-lg text-sm text-center px-4">
+                                Complete 3 daily check-ins to unlock weekly insights.
+                            </div>
+                            <Button asChild variant="ghost" className="w-full mt-4 hover:bg-white/5">
+                                <Link href="/weekly">Go to Weekly Review</Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
-            )
+        </>
+    )
 }
