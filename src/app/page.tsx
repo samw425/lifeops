@@ -1,68 +1,159 @@
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Sparkles, CheckCircle2, TrendingUp, Calendar, ArrowRight } from 'lucide-react'
+'use client';
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Loader2, Sparkles, ArrowRight, LayoutGrid } from 'lucide-react';
+import { LiquidApp } from '@/lib/liquid-engine/types';
+
+export default function LiquidCommandCenter() {
+    const [prompt, setPrompt] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [myApps, setMyApps] = useState<LiquidApp[]>([]);
+    const supabase = createClient();
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchApps = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { data } = await supabase
+                .from('liquid_apps')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (data) setMyApps(data);
+        };
+
+        fetchApps();
+    }, [supabase]);
+
+    const handleGenerate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!prompt.trim()) return;
+
+        setIsGenerating(true);
+
+        try {
+            // 1. Generate Schema via AI
+            const res = await fetch('/api/liquid/generate', {
+                method: 'POST',
+                body: JSON.stringify({ prompt }),
+            });
+            const { schema } = await res.json();
+
+            // 2. Save to Supabase
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                // Handle unauthenticated state (redirect to login)
+                router.push('/login');
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('liquid_apps')
+                .insert({
+                    user_id: user.id,
+                    name: schema.appName,
+                    description: schema.description,
+                    schema: schema,
+                    data: { records: [] }
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            // 3. Redirect to new App
+            router.push(`/app/${data.id}`);
+
+        } catch (error) {
+            console.error('Generation failed:', error);
+            alert('Failed to generate app. Please try again.');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     return (
-        <div className="min-h-screen gradient-bg">
+        <div className="min-h-screen bg-background flex flex-col">
             {/* Hero Section */}
-            <div className="container mx-auto px-4 py-20">
-                <div className="max-w-4xl mx-auto text-center space-y-8 animate-slide-in">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-                        <Sparkles className="w-4 h-4 text-primary" />
-                        <span className="text-sm font-medium text-primary">Clarity You Can Live In</span>
-                    </div>
-
-                    <h1 className="text-6xl md:text-7xl font-bold tracking-tight text-foreground">
-                        Your Personal <span className="text-primary">Operating System</span>
+            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-3xl mx-auto w-full">
+                <div className="mb-8 space-y-4">
+                    <h1 className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+                        Liquid OS
                     </h1>
-
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                        LifeOps™ transforms your mental chaos into clear priorities with LifeOps AI—our proprietary intelligence that learns how you work.
+                    <p className="text-xl text-muted-foreground">
+                        The last app you will ever need. Just describe it, and we build it.
                     </p>
-
-                    <div className="flex gap-4 justify-center pt-4">
-                        <Button asChild size="lg" className="text-lg h-14 px-8 shadow-xl shadow-primary/25 animate-scale-in">
-                            <Link href="/login">
-                                Get Started Free <ArrowRight className="ml-2 w-5 h-5" />
-                            </Link>
-                        </Button>
-                    </div>
                 </div>
 
-                {/* Features Grid */}
-                <div className="grid md:grid-cols-3 gap-6 mt-24 max-w-5xl mx-auto">
-                    <div className="glass p-8 rounded-2xl card-hover">
-                        <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
-                            <CheckCircle2 className="w-6 h-6 text-blue-500" />
-                        </div>
-                        <h3 className="text-xl font-semibold mb-2">Daily Clarity</h3>
-                        <p className="text-muted-foreground">
-                            Brain dump → LifeOps AI sorts → 3 clear priorities. Every single day.
-                        </p>
-                    </div>
+                <Card className="w-full shadow-2xl border-primary/20 bg-card/50 backdrop-blur">
+                    <CardContent className="p-6">
+                        <form onSubmit={handleGenerate} className="flex gap-3">
+                            <Input
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                placeholder="I need an app to track my freelance projects..."
+                                className="text-lg p-6 h-14"
+                                disabled={isGenerating}
+                            />
+                            <Button type="submit" size="lg" className="h-14 px-8" disabled={isGenerating}>
+                                {isGenerating ? (
+                                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                                ) : (
+                                    <Sparkles className="w-5 h-5 mr-2" />
+                                )}
+                                Generate
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
 
-                    <div className="glass p-8 rounded-2xl card-hover">
-                        <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
-                            <TrendingUp className="w-6 h-6 text-purple-500" />
-                        </div>
-                        <h3 className="text-xl font-semibold mb-2">Pattern Recognition</h3>
-                        <p className="text-muted-foreground">
-                            LifeOps AI analyzes your week to find what works and what doesn't.
-                        </p>
-                    </div>
-
-                    <div className="glass p-8 rounded-2xl card-hover">
-                        <div className="w-12 h-12 bg-pink-500/10 rounded-xl flex items-center justify-center mb-4">
-                            <Calendar className="w-6 h-6 text-pink-500" />
-                        </div>
-                        <h3 className="text-xl font-semibold mb-2">Weekly Evolution</h3>
-                        <p className="text-muted-foreground">
-                            Continuous improvement through LifeOps AI-suggested experiments.
-                        </p>
-                    </div>
+                {/* Examples */}
+                <div className="mt-8 flex gap-4 text-sm text-muted-foreground">
+                    <span>Try:</span>
+                    <button onClick={() => setPrompt("Simple CRM for my bakery")} className="hover:text-primary transition-colors">"CRM for bakery"</button>
+                    <span>•</span>
+                    <button onClick={() => setPrompt("Track my daily mood and sleep")} className="hover:text-primary transition-colors">"Mood Tracker"</button>
+                    <span>•</span>
+                    <button onClick={() => setPrompt("Wedding guest list manager")} className="hover:text-primary transition-colors">"Wedding Planner"</button>
                 </div>
             </div>
+
+            {/* My Apps Grid */}
+            {myApps.length > 0 && (
+                <div className="bg-secondary/20 p-10 border-t">
+                    <div className="max-w-6xl mx-auto">
+                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                            <LayoutGrid className="w-6 h-6" />
+                            Your Apps
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {myApps.map((app) => (
+                                <Card
+                                    key={app.id}
+                                    className="hover:shadow-lg transition-all cursor-pointer hover:border-primary/50 group"
+                                    onClick={() => router.push(`/app/${app.id}`)}
+                                >
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center justify-between">
+                                            {app.name}
+                                            <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </CardTitle>
+                                        <CardDescription className="line-clamp-2">{app.description}</CardDescription>
+                                    </CardHeader>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
-    )
+    );
 }
