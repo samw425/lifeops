@@ -16,14 +16,21 @@ export default async function DashboardPage() {
         return <div>Please log in</div>
     }
 
-    // Fetch user profile for personalization
-    const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('first_name')
-        .eq('user_id', user.id)
-        .single()
+    // Fetch user profile for personalization (gracefully handle if table doesn't exist)
+    let displayName = user.email?.split('@')[0] || 'there'
+    try {
+        const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('first_name')
+            .eq('user_id', user.id)
+            .single()
 
-    const displayName = profile?.first_name || user.email?.split('@')[0] || 'there'
+        if (profile?.first_name) {
+            displayName = profile.first_name
+        }
+    } catch (err) {
+        // Table doesn't exist yet - use email fallback
+    }
 
     const today = new Date().toISOString().split('T')[0]
 
