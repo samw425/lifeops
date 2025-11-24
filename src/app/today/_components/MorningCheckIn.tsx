@@ -109,7 +109,7 @@ export default function MorningCheckIn({ focusAreas, goals }: { focusAreas: any[
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <p className="text-sm text-muted-foreground">
-                        What's on your mind? Don't filter. The AI will help you find clarity.
+                        What's on your mind? Don't filter. We'll help you find clarity.
                     </p>
                     <textarea
                         className="w-full min-h-[150px] p-3 rounded-md border bg-background"
