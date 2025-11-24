@@ -43,17 +43,32 @@ export default function OnboardingTour() {
         const checkOnboarding = async () => {
             const hasSeenTour = localStorage.getItem('lifeops_onboarding_seen')
             if (!hasSeenTour) {
-                // Check if user has a profile
-                const { data: profile } = await supabase
-                    .from('user_profiles')
-                    .select('first_name')
-                    .single()
+                try {
+                    const { data: { user } } = await supabase.auth.getUser();
 
-                if (!profile) {
+                    if (!user) {
+                        // If no user is logged in, don't show onboarding tour
+                        // or handle as per application logic (e.g., redirect to login)
+                        return;
+                    }
+
+                    // Check if user has a profile
+                    const { data: profile, error } = await supabase
+                        .from('user_profiles')
+                        .select('first_name')
+                        .eq('user_id', user.id)
+                        .single()
+
+                    // If table doesn't exist or no profile, show tour
+                    if (error || !profile) {
+                        setIsOpen(true)
+                    } else {
+                        // Has profile, mark as seen
+                        localStorage.setItem('lifeops_onboarding_seen', 'true')
+                    }
+                } catch (err) {
+                    // Fail gracefully - show tour if anything goes wrong (e.g., network error, Supabase client error)
                     setIsOpen(true)
-                } else {
-                    // Has profile, mark as seen
-                    localStorage.setItem('lifeops_onboarding_seen', 'true')
                 }
             }
         }
@@ -71,10 +86,16 @@ export default function OnboardingTour() {
     }
 
     const handleSkipName = async () => {
-        // Create profile without name
-        await supabase.from('user_profiles').insert({
-            first_name: null
-        })
+        try {
+            // Try to create profile without name
+            await supabase.from('user_profiles').insert({
+                user_id: (await supabase.auth.getUser()).data.user?.id,
+                first_name: null
+            })
+        } catch (err) {
+            // Silently fail if table doesn't exist - not critical for MVP
+            console.log('Profile creation skipped:', err)
+        }
         setShowNameInput(false)
         localStorage.setItem('lifeops_onboarding_seen', 'true')
         router.refresh()
@@ -87,9 +108,15 @@ export default function OnboardingTour() {
         }
 
         setSaving(true)
-        await supabase.from('user_profiles').insert({
-            first_name: firstName.trim()
-        })
+        try {
+            await supabase.from('user_profiles').insert({
+                user_id: (await supabase.auth.getUser()).data.user?.id,
+                first_name: firstName.trim()
+            })
+        } catch (err) {
+            console.log('Profile creation failed:', err)
+            // Continue anyway - name is nice-to-have, not critical
+        }
         setSaving(false)
         setShowNameInput(false)
         localStorage.setItem('lifeops_onboarding_seen', 'true')
