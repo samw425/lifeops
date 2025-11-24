@@ -86,10 +86,10 @@ export default function LiquidCommandCenter() {
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-3xl mx-auto w-full">
                 <div className="mb-8 space-y-4">
                     <h1 className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-                        Liquid OS
+                        Adaptum
                     </h1>
                     <p className="text-xl text-muted-foreground">
-                        The last app you will ever need. Just describe it, and we build it.
+                        The World's First Adaptive System. Software that rewrites itself around you.
                     </p>
                 </div>
 

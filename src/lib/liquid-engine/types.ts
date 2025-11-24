@@ -1,4 +1,5 @@
 export type FieldType = 'text' | 'number' | 'date' | 'select' | 'currency' | 'status' | 'rich-text';
+export type PersonalityType = 'minimalist' | 'analyst' | 'creative' | 'power';
 
 export interface LiquidField {
     id: string;
@@ -21,6 +22,7 @@ export interface LiquidView {
 export interface LiquidSchema {
     appName: string;
     description: string;
+    personality?: PersonalityType;
     fields: LiquidField[];
     views: LiquidView[];
 }

@@ -10,6 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { LiquidInput } from '@/components/liquid/LiquidInput';
 import { useRouter } from 'next/navigation';
 
+import { AutonomousLayer } from '@/components/liquid/AutonomousLayer';
+import { MindMirror } from '@/components/liquid/MindMirror';
+
 export default function AppRendererPage({ params }: { params: { id: string } }) {
     const [app, setApp] = useState<LiquidApp | null>(null);
     const [loading, setLoading] = useState(true);
@@ -66,7 +69,7 @@ export default function AppRendererPage({ params }: { params: { id: string } }) 
         }
     };
 
-    if (loading) return <div className="flex items-center justify-center h-screen">Loading Liquid App...</div>;
+    if (loading) return <div className="flex items-center justify-center h-screen">Loading Adaptum...</div>;
     if (!app) return <div className="flex items-center justify-center h-screen">App not found</div>;
 
     return (
@@ -105,10 +108,15 @@ export default function AppRendererPage({ params }: { params: { id: string } }) 
                 </div>
             </header>
 
-            <main>
-                {/* Default to the first view for now */}
-                <LiquidRenderer app={app} viewId={app.schema.views[0].id} />
-            </main>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <main className="lg:col-span-3">
+                    <LiquidRenderer app={app} viewId={app.schema.views[0].id} />
+                </main>
+                <aside className="space-y-6">
+                    <AutonomousLayer app={app} />
+                    <MindMirror app={app} />
+                </aside>
+            </div>
         </div>
     );
 }

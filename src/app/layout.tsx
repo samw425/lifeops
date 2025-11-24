@@ -6,8 +6,8 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Liquid OS",
-  description: "The Shape-Shifting Operating System",
+  title: "Adaptum",
+  description: "The World's First Adaptive System",
 };
 
 export default function RootLayout({

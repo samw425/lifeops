@@ -2,6 +2,7 @@ import { LiquidApp, LiquidRecord } from '@/lib/liquid-engine/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { AnalystTable, CreativeGallery } from '@/components/liquid/Personalities';
 
 interface LiquidViewProps {
     app: LiquidApp;
@@ -12,6 +13,16 @@ interface LiquidViewProps {
 export function LiquidRenderer({ app, viewId, onRecordClick }: LiquidViewProps) {
     const view = app.schema.views.find((v) => v.id === viewId) || app.schema.views[0];
     const records = app.data.records;
+    const personality = app.schema.personality || 'minimalist';
+
+    // Personality-based overrides
+    if (personality === 'analyst' && view.type === 'list') {
+        return <AnalystTable app={app} records={records} onRecordClick={onRecordClick} />;
+    }
+
+    if (personality === 'creative' && view.type === 'list') {
+        return <CreativeGallery app={app} records={records} onRecordClick={onRecordClick} />;
+    }
 
     if (view.type === 'kanban') {
         const groupFieldId = view.groupBy;
